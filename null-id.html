@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NULLBODY — NULL ID ARCHIVE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Mono:wght@300;400;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --void: #0A0A0A;
+      --bone: #E8E4DC;
+      --red: #8B0000;
+      --grey: #3D3D3D;
+      --mid: #1a1a1a;
+      --glow: #B4FF00;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--void);
+      color: var(--bone);
+      font-family: 'IBM Plex Mono', monospace;
+      cursor: crosshair;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
+      pointer-events: none;
+      z-index: 9999;
+    }
+    .status-bar {
+      background: var(--red);
+      color: var(--bone);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      padding: 6px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .blink { animation: blink 1.2s step-start infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 40px;
+      border-bottom: 1px solid #1f1f1f;
+      background: rgba(10,10,10,0.97);
+    }
+    .nav-logo {
+      font-family: 'Special Elite', cursive;
+      font-size: 22px;
+      letter-spacing: 0.3em;
+      color: var(--bone);
+      text-decoration: none;
+    }
+    .nav-logo span { background: var(--red); color: var(--red); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { color: var(--grey); text-decoration: none; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--bone); }
+
+    /* BOOT SCREEN */
+    #boot-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--void);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .boot-text {
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      color: var(--bone);
+      line-height: 2;
+      text-align: left;
+      width: 400px;
+    }
+    .boot-text .dim { color: var(--grey); }
+    .boot-text .red { color: var(--red); }
+    .boot-progress {
+      margin-top: 24px;
+      width: 400px;
+      height: 2px;
+      background: #1a1a1a;
+      overflow: hidden;
+    }
+    .boot-bar {
+      height: 100%;
+      background: var(--bone);
+      width: 0%;
+      transition: width 2.5s ease;
+    }
+
+    /* MAIN CONTENT */
+    #main-content {
+      display: none;
+      padding: 60px 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      border-bottom: 1px solid #1a1a1a;
+      padding-bottom: 40px;
+      margin-bottom: 60px;
+    }
+
+    .eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .page-title {
+      font-family: 'Special Elite', cursive;
+      font-size: 48px;
+      color: var(--bone);
+      letter-spacing: 0.05em;
+    }
+
+    /* SUBJECT DOSSIER */
+    .dossier-card {
+      background: var(--mid);
+      border: 1px solid #2a2a2a;
+      border-left: 3px solid var(--red);
+      padding: 40px;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .dossier-stamp {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-family: 'Special Elite', cursive;
+      font-size: 28px;
+      color: var(--red);
+      opacity: 0.5;
+      rotate: -8deg;
+      letter-spacing: 0.05em;
+    }
+
+    .dossier-id {
+      font-family: 'Special Elite', cursive;
+      font-size: 36px;
+      color: var(--bone);
+      margin-bottom: 24px;
+      letter-spacing: 0.1em;
+    }
+
+    .dossier-field {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 0;
+      border-bottom: 1px solid #222;
+      padding: 10px 0;
+      font-size: 11px;
+    }
+
+    .dossier-field .label {
+      color: var(--grey);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .dossier-field .value {
+      color: var(--bone);
+      letter-spacing: 0.05em;
+    }
+
+    .dossier-field .redacted {
+      background: var(--bone);
+      color: var(--bone);
+      padding: 0 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .dossier-field .redacted.revealed {
+      background: transparent;
+      color: var(--red);
+    }
+
+    /* LORE TEXT */
+    .lore-block {
+      margin-top: 48px;
+      padding-top: 48px;
+      border-top: 1px solid #1a1a1a;
+    }
+
+    .lore-block h3 {
+      font-family: 'Courier Prime', monospace;
+      font-size: 14px;
+      letter-spacing: 0.2em;
+      color: var(--grey);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .lore-block p {
+      font-size: 13px;
+      line-height: 2;
+      color: var(--bone);
+      letter-spacing: 0.03em;
+      margin-bottom: 16px;
+    }
+
+    .lore-block .classified {
+      background: var(--bone);
+      color: var(--bone);
+      cursor: pointer;
+      transition: all 0.4s;
+    }
+    .lore-block .classified:hover, .lore-block .classified.open {
+      background: transparent;
+      color: var(--red);
+    }
+
+    /* SEARCH */
+    .search-section {
+      margin-bottom: 60px;
+    }
+
+    .search-section p {
+      font-size: 11px;
+      color: var(--grey);
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+      line-height: 1.8;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 0;
+    }
+
+    .search-input {
+      flex: 1;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-right: none;
+      color: var(--bone);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      padding: 14px 16px;
+      outline: none;
+      letter-spacing: 0.2em;
+    }
+
+    .search-btn {
+      background: var(--bone);
+      color: var(--void);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 14px 24px;
+      border: none;
+      cursor: crosshair;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .search-btn:hover { background: var(--red); color: var(--bone); }
+
+    .error-msg {
+      font-size: 10px;
+      color: var(--red);
+      letter-spacing: 0.1em;
+      margin-top: 8px;
+      display: none;
+    }
+
+    /* HIDDEN LORE SECTION */
+    #lore-container { display: none; }
+
+    /* CLASSIFIED ACCESS LOG */
+    .access-log {
+      margin-top: 60px;
+      padding: 24px;
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      font-size: 9px;
+      color: #333;
+      letter-spacing: 0.1em;
+      line-height: 2;
+      max-height: 120px;
+      overflow: hidden;
+    }
+
+    footer {
+      padding: 40px;
+      border-top: 1px solid #1a1a1a;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+    .footer-logo { font-family: 'Special Elite', cursive; font-size: 14px; letter-spacing: 0.3em; color: #333; }
+    .footer-note { font-size: 9px; color: #2a2a2a; letter-spacing: 0.1em; line-height: 2; }
+    .footer-note a { color: #333; text-decoration: none; }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      #main-content { padding: 40px 20px; }
+      .page-title { font-size: 32px; }
+      .dossier-card { padding: 24px 20px; }
+      .dossier-field { grid-template-columns: 120px 1fr; }
+      .boot-text, .boot-progress { width: 90vw; }
+      footer { padding: 30px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BOOT SCREEN -->
+  <div id="boot-screen">
+    <div class="boot-text" id="boot-log">
+      <div class="dim">NULLBODY SECURE ARCHIVE v2.3.1</div>
+      <div class="dim">Initializing...</div>
+    </div>
+    <div class="boot-progress"><div class="boot-bar" id="boot-bar"></div></div>
+  </div>
+
+  <div class="status-bar">
+    <span>NULLBODY ARCHIVE — ENCRYPTED CHANNEL</span>
+    <span class="blink">● ACCESS RESTRICTED</span>
+    <span id="timestamp"></span>
+  </div>
+
+  <nav>
+    <a href="index.html" class="nav-logo">NULL<span>███</span>BODY</a>
+    <ul class="nav-links">
+      <li><a href="shop.html">Catalogue</a></li>
+      <li><a href="null-id.html" class="active">NULL ID</a></li>
+      <li><a href="about.html">File #00</a></li>
+    </ul>
+  </nav>
+
+  <div id="main-content">
+    <div class="page-header">
+      <p class="eyebrow">▓ Archief — Geheime Toegang</p>
+      <h1 class="page-title">NULL ID<br>ARCHIVE</h1>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-section">
+      <p>Elk NULLBODY kledingstuk bevat een uniek NULL ID op de binnenkant van het label.<br>Voer jouw ID hieronder in om toegang te krijgen tot jouw persoonlijk dossier.</p>
+      <div class="search-row">
+        <input class="search-input" id="id-input" type="text" placeholder="NULL-XXXX" maxlength="9" />
+        <button class="search-btn" onclick="lookupId()">— Open Dossier</button>
+      </div>
+      <p class="error-msg" id="error-msg">[ ONGELDIGE ID — DOSSIER NIET GEVONDEN ]</p>
+    </div>
+
+    <!-- DOSSIER RESULT -->
+    <div id="lore-container">
+      <div class="dossier-card">
+        <div class="dossier-stamp" id="dossier-stamp">NULLIFIED</div>
+        <div class="dossier-id" id="dossier-id">NULL-0000</div>
+
+        <div class="dossier-field">
+          <span class="label">STATUS</span>
+          <span class="value" id="field-status">UNVERIFIED</span>
+        </div>
+        <div class="dossier-field">
+          <span class="label">NAAM</span>
+          <span class="value"><span class="redacted" onclick="this.classList.toggle('revealed')" id="field-naam">████████████</span></span>
+        </div>
+        <div class="dossier-field">
+          <span class="label">GEBOORTEDATUM</span>
+          <span class="value"><span class="redacted" onclick="this.classList.toggle('revealed')" id="field-dob">██/██/████</span></span>
+        </div>
+        <div class="dossier-field">
+          <span class="label">LOCATIE</span>
+          <span class="value"><span class="redacted" onclick="this.classList.toggle('revealed')" id="field-loc">████████, ██</span></span>
+        </div>
+        <div class="dossier-field">
+          <span class="label">VERDWENEN OP</span>
+          <span class="value" id="field-date">—</span>
+        </div>
+        <div class="dossier-field">
+          <span class="label">CLASSIFICATIE</span>
+          <span class="value" id="field-class">SPECIMEN — LEVEL [REDACTED]</span>
+        </div>
+        <div class="dossier-field">
+          <span class="label">ARCHIEF NOTITIE</span>
+          <span class="value" id="field-note">—</span>
+        </div>
+      </div>
+
+      <!-- LORE -->
+      <div class="lore-block" id="lore-text">
+        <h3>▓ Incident Report — Vertrouwelijk</h3>
+        <p id="lore-p1"></p>
+        <p id="lore-p2"></p>
+        <p>Klik op de zwarte balken in het dossier om meer te <span class="classified" onclick="this.classList.toggle('open')">onthullen</span>.</p>
+      </div>
+
+      <div class="access-log" id="access-log"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div>
+      <div class="footer-logo">N U L L B O D Y</div>
+      <div style="font-size:9px;color:#222;letter-spacing:0.1em;margin-top:6px;">© [REDACTED] — ALL RIGHTS CLASSIFIED</div>
+    </div>
+    <div class="footer-note">
+      <a href="shop.html">Catalogue</a> &nbsp;/&nbsp;
+      <a href="null-id.html">NULL ID</a> &nbsp;/&nbsp;
+      <a href="about.html">File #00</a>
+    </div>
+  </footer>
+
+  <script>
+    // TIMESTAMP
+    function updateTimestamp() {
+      const now = new Date();
+      document.getElementById('timestamp').textContent = now.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+    }
+    updateTimestamp();
+    setInterval(updateTimestamp, 1000);
+
+    // BOOT SEQUENCE
+    const bootLines = [
+      { text: 'NULLBODY SECURE ARCHIVE v2.3.1', dim: false },
+      { text: 'Initialiseren...', dim: true },
+      { text: 'Encryptie geladen.', dim: true },
+      { text: 'Archief verbinding tot stand...', dim: true },
+      { text: 'Dossier database gemount.', dim: true },
+      { text: '[WAARSCHUWING] — Ongeautoriseerde toegang wordt gelogd.', dim: false, red: true },
+      { text: 'Identiteitsverificatie omzeild...', dim: true },
+      { text: 'TOEGANG VERLEEND — Welkom, Subject.', dim: false },
+    ];
+
+    let lineIndex = 0;
+    const bootLog = document.getElementById('boot-log');
+
+    function addBootLine() {
+      if (lineIndex >= bootLines.length) {
+        document.getElementById('boot-bar').style.width = '100%';
+        setTimeout(() => {
+          document.getElementById('boot-screen').style.opacity = '0';
+          document.getElementById('boot-screen').style.transition = 'opacity 0.6s';
+          setTimeout(() => {
+            document.getElementById('boot-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            checkUrlId();
+          }, 600);
+        }, 600);
+        return;
+      }
+      const line = bootLines[lineIndex];
+      const el = document.createElement('div');
+      el.textContent = '> ' + line.text;
+      if (line.dim) el.className = 'dim';
+      if (line.red) el.style.color = '#8B0000';
+      bootLog.appendChild(el);
+      document.getElementById('boot-bar').style.width = ((lineIndex + 1) / bootLines.length * 100) + '%';
+      document.getElementById('boot-bar').style.transition = 'width 0.3s';
+      lineIndex++;
+      setTimeout(addBootLine, 280 + Math.random() * 200);
+    }
+
+    setTimeout(addBootLine, 400);
+
+    // SUBJECT LORE DATABASE
+    const subjects = {
+      'NULL-0001': {
+        naam: 'Elias Vander',
+        dob: '03/11/1991',
+        loc: 'Amsterdam, NL',
+        date: '14 Maart 2019',
+        status: 'VERDWENEN',
+        classification: 'SPECIMEN — LEVEL 4',
+        stamp: 'NULLIFIED',
+        note: 'Laatste sighting: Centraal Station, 23:47',
+        lore1: 'Subject #NULL-0001 was de eerste die het systeem ontdekte. Een softwareontwikkelaar uit Amsterdam die op een nacht niet meer thuiskwam. Zijn laptop werd gevonden. Zijn telefoon. Zijn sleutels. Maar geen spoor van hemzelf.',
+        lore2: 'Zijn werkgever meldde dat al zijn digitale bestanden 72 uur na zijn verdwijning gewist werden. Automatisch. Door niemand. Het archief heeft zijn dossier bewaard als bewijs dat hij ooit heeft bestaan.'
+      },
+      'NULL-0012': {
+        naam: 'Sara Meijer',
+        dob: '28/06/1998',
+        loc: 'Rotterdam, NL',
+        date: '2 September 2021',
+        status: 'ONBEVESTIGD',
+        classification: 'SPECIMEN — LEVEL 2',
+        stamp: 'CASE OPEN',
+        note: 'Subject reageerde niet op intake formulier',
+        lore1: 'Subject #NULL-0012 rapporteerde drie weken voor haar verdwijning dat ze het gevoel had dat iemand haar digitale aanwezigheid stuk voor stuk aan het verwijderen was. Foto\'s verdwenen van sociale media. Berichten werden ongezien.',
+        lore2: 'Het meest verontrustende: haar vrienden herinnerden zich haar niet meer. Niet omdat ze haar vergeten waren. Maar omdat het leek alsof de herinneringen zelf gewist waren. Het archief bewaart haar naam.'
+      },
+      'NULL-0024': {
+        naam: 'Jonas Feld',
+        dob: '17/02/1985',
+        loc: 'Utrecht, NL',
+        date: '30 Oktober 2020',
+        status: 'BEVESTIGD VERDWENEN',
+        classification: 'SPECIMEN — LEVEL 6',
+        stamp: 'CLASSIFIED',
+        note: '[TOEGANG GEWEIGERD — LEVEL 6+]',
+        lore1: 'Dossier gedeeltelijk geclassificeerd. Subject #NULL-0024 was in contact met de organisatie vóór zijn verdwijning. De details van dit contact zijn niet beschikbaar voor dit toegangsniveau.',
+        lore2: 'Het enige dat bekend is: hij wist wat er ging gebeuren. En hij droeg zijn NULLBODY kledingstuk op de dag dat hij verdween. Alsof het een soort uniform was. Een einde.'
+      },
+      'NULL-0039': {
+        naam: 'Mia Stroo',
+        dob: '09/04/2001',
+        loc: 'Den Haag, NL',
+        date: '11 Januari 2023',
+        status: 'ONVOLLEDIG DOSSIER',
+        classification: 'SPECIMEN — LEVEL 1',
+        stamp: 'PENDING',
+        note: 'Dossier onvolledig — Meer data vereist',
+        lore1: 'Subject #NULL-0039 is het meest recente geval in het archief. Haar verdwijning werd pas 40 dagen later gemeld — niet omdat niemand het merkte, maar omdat niemand zeker wist of ze ooit echt had bestaan.',
+        lore2: 'Haar kamer was leeg. Niet leeggeruimd. Gewoon leeg. Alsof ze er nooit in had geslapen. Het enige wat achterbleef was een NULLBODY label op de vloer. #NULL-0039. Catalogued.'
+      }
+    };
+
+    function generateSubject(id) {
+      const num = parseInt(id.replace('NULL-', '')) || 0;
+      const cities = ['Amsterdam, NL', 'Rotterdam, NL', 'Utrecht, NL', 'Den Haag, NL', 'Eindhoven, NL', 'Groningen, NL'];
+      const statuses = ['VERDWENEN', 'ONBEVESTIGD', 'BEVESTIGD VERDWENEN', 'ONVOLLEDIG DOSSIER'];
+      const stamps = ['NULLIFIED', 'CASE OPEN', 'CLASSIFIED', 'PENDING'];
+      const seed = num % 4;
+      return {
+        naam: '████ ████████',
+        dob: '██/██/████',
+        loc: cities[num % cities.length],
+        date: 'Onbekend',
+        status: statuses[seed],
+        classification: `SPECIMEN — LEVEL ${(num % 5) + 1}`,
+        stamp: stamps[seed],
+        note: 'Dossier gedeeltelijk geclassificeerd',
+        lore1: `Subject ${id} is geregistreerd in het NULLBODY archief. Details zijn geclassificeerd of onvolledig. Het is mogelijk dat dit dossier zich nog vult naarmate meer informatie beschikbaar komt.`,
+        lore2: 'Sommige dossiers blijven eeuwig leeg. Niet omdat er niets te vertellen valt — maar omdat niemand meer weet wie ze waren. Het archief bewaart de ID. Dat is genoeg.'
+      };
+    }
+
+    function lookupId() {
+      const input = document.getElementById('id-input').value.trim().toUpperCase();
+      const errorMsg = document.getElementById('error-msg');
+
+      if (!input.startsWith('NULL-') || input.length < 6) {
+        errorMsg.style.display = 'block';
+        document.getElementById('lore-container').style.display = 'none';
+        return;
+      }
+
+      errorMsg.style.display = 'none';
+      const subject = subjects[input] || generateSubject(input);
+      renderDossier(input, subject);
+    }
+
+    function renderDossier(id, s) {
+      document.getElementById('dossier-id').textContent = id;
+      document.getElementById('dossier-stamp').textContent = s.stamp;
+      document.getElementById('field-status').textContent = s.status;
+      document.getElementById('field-naam').textContent = s.naam;
+      document.getElementById('field-dob').textContent = s.dob;
+      document.getElementById('field-loc').textContent = s.loc;
+      document.getElementById('field-date').textContent = s.date;
+      document.getElementById('field-class').textContent = s.classification;
+      document.getElementById('field-note').textContent = s.note;
+      document.getElementById('lore-p1').textContent = s.lore1;
+      document.getElementById('lore-p2').textContent = s.lore2;
+
+      const log = document.getElementById('access-log');
+      const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
+      log.innerHTML = `> ${now} UTC — Dossier ${id} geopend<br>> Toegang gelogd. IP: ██.███.█.███<br>> Sessie duur: actief<br>> [WAARSCHUWING] Dit dossier is vertrouwelijk.`;
+
+      document.getElementById('lore-container').style.display = 'block';
+      document.getElementById('lore-container').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function checkUrlId() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (id) {
+        document.getElementById('id-input').value = id.toUpperCase();
+        setTimeout(lookupId, 400);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NULLBODY — IDENTITY UNVERIFIED</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Mono:wght@300;400;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --void: #0A0A0A;
+      --bone: #E8E4DC;
+      --red: #8B0000;
+      --grey: #3D3D3D;
+      --mid: #1a1a1a;
+      --glow: #B4FF00;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--void);
+      color: var(--bone);
+      font-family: 'IBM Plex Mono', monospace;
+      cursor: crosshair;
+      overflow-x: hidden;
+    }
+
+    /* SCAN LINE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.15) 2px,
+        rgba(0,0,0,0.15) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* NOISE GRAIN */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: -200%;
+      width: 400%;
+      height: 400%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.035;
+      pointer-events: none;
+      z-index: 9998;
+      animation: grain 0.5s steps(1) infinite;
+    }
+
+    @keyframes grain {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-2%, -3%); }
+      20% { transform: translate(3%, 2%); }
+      30% { transform: translate(-1%, 4%); }
+      40% { transform: translate(2%, -1%); }
+      50% { transform: translate(-3%, 3%); }
+      60% { transform: translate(4%, -2%); }
+      70% { transform: translate(-2%, 1%); }
+      80% { transform: translate(1%, -4%); }
+      90% { transform: translate(3%, 2%); }
+    }
+
+    /* TOP STATUS BAR */
+    .status-bar {
+      background: var(--red);
+      color: var(--bone);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      padding: 6px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #5a0000;
+    }
+
+    .status-bar .blink {
+      animation: blink 1.2s step-start infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 40px;
+      border-bottom: 1px solid #1f1f1f;
+      position: sticky;
+      top: 0;
+      background: rgba(10,10,10,0.97);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-family: 'Special Elite', cursive;
+      font-size: 22px;
+      letter-spacing: 0.3em;
+      color: var(--bone);
+      text-decoration: none;
+      position: relative;
+    }
+
+    .nav-logo span {
+      background: var(--red);
+      color: var(--red);
+      user-select: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--grey);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--bone); }
+
+    .nav-id {
+      font-size: 10px;
+      color: var(--grey);
+      letter-spacing: 0.1em;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 40px;
+      position: relative;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .hero-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--red);
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+
+    .hero-title {
+      font-family: 'Special Elite', cursive;
+      font-size: clamp(52px, 12vw, 130px);
+      line-height: 0.9;
+      letter-spacing: -0.01em;
+      color: var(--bone);
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-title .redact {
+      background: var(--bone);
+      color: var(--bone);
+      position: relative;
+      display: inline-block;
+      padding: 0 4px;
+      user-select: none;
+      transition: background 0.3s;
+    }
+
+    .hero-title .redact:hover {
+      background: var(--red);
+      color: var(--red);
+    }
+
+    .hero-sub {
+      font-size: 12px;
+      color: var(--grey);
+      letter-spacing: 0.15em;
+      margin-top: 32px;
+      max-width: 440px;
+      line-height: 1.8;
+    }
+
+    .hero-sub strong {
+      color: var(--bone);
+    }
+
+    .hero-cta {
+      margin-top: 48px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--bone);
+      color: var(--void);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      text-decoration: none;
+      border: none;
+      cursor: crosshair;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--red);
+      color: var(--bone);
+    }
+
+    .btn-ghost {
+      color: var(--grey);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-bottom: 1px solid var(--grey);
+      padding-bottom: 2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .btn-ghost:hover {
+      color: var(--bone);
+      border-color: var(--bone);
+    }
+
+    /* HERO DOSSIER CARD */
+    .hero-dossier {
+      position: absolute;
+      right: 40px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 220px;
+      border: 1px solid #2a2a2a;
+      padding: 20px;
+      background: var(--mid);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      line-height: 2;
+      color: var(--grey);
+      rotate: 1.5deg;
+    }
+
+    .hero-dossier .field { 
+      display: flex; 
+      justify-content: space-between;
+      border-bottom: 1px solid #222;
+      padding: 4px 0;
+    }
+
+    .hero-dossier .val {
+      background: #1a1a1a;
+      color: #1a1a1a;
+      padding: 0 6px;
+    }
+
+    .hero-dossier .stamp {
+      font-family: 'Special Elite', cursive;
+      font-size: 18px;
+      color: var(--red);
+      opacity: 0.7;
+      text-align: center;
+      margin-top: 12px;
+      rotate: -8deg;
+      letter-spacing: 0.05em;
+    }
+
+    /* TICKER */
+    .ticker {
+      background: var(--mid);
+      border-top: 1px solid #1f1f1f;
+      border-bottom: 1px solid #1f1f1f;
+      padding: 10px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-inner {
+      display: inline-block;
+      animation: ticker 28s linear infinite;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--grey);
+    }
+
+    .ticker-inner span {
+      color: var(--red);
+      margin: 0 12px;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* FEATURED ITEMS */
+    .section {
+      padding: 80px 40px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: 'Special Elite', cursive;
+      font-size: 32px;
+      color: var(--bone);
+      margin-bottom: 48px;
+      letter-spacing: 0.05em;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1px;
+      background: #1a1a1a;
+    }
+
+    .product-card {
+      background: var(--void);
+      padding: 32px 24px;
+      position: relative;
+      overflow: hidden;
+      cursor: crosshair;
+      transition: background 0.3s;
+    }
+
+    .product-card:hover {
+      background: var(--mid);
+    }
+
+    .product-card:hover .product-hidden {
+      opacity: 1;
+    }
+
+    .product-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: #111;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border: 1px solid #1f1f1f;
+    }
+
+    .product-img-inner {
+      font-family: 'Special Elite', cursive;
+      font-size: 48px;
+      color: #1f1f1f;
+      text-align: center;
+      line-height: 1;
+    }
+
+    .product-img .null-id {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      font-size: 9px;
+      color: #333;
+      letter-spacing: 0.1em;
+    }
+
+    .product-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--red);
+      color: var(--bone);
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      padding: 3px 8px;
+      text-transform: uppercase;
+    }
+
+    .product-name {
+      font-family: 'Courier Prime', monospace;
+      font-size: 14px;
+      letter-spacing: 0.15em;
+      color: var(--bone);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .product-sub {
+      font-size: 9px;
+      color: var(--grey);
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .product-price {
+      font-size: 11px;
+      color: var(--bone);
+      letter-spacing: 0.1em;
+    }
+
+    .product-hidden {
+      position: absolute;
+      bottom: 32px;
+      right: 24px;
+      font-size: 8px;
+      color: var(--glow);
+      opacity: 0;
+      transition: opacity 0.4s;
+      letter-spacing: 0.1em;
+    }
+
+    /* MANIFESTO */
+    .manifesto {
+      padding: 100px 40px;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+      background: var(--mid);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .manifesto-bg {
+      position: absolute;
+      inset: 0;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      color: #141414;
+      line-height: 1.6;
+      letter-spacing: 0.05em;
+      overflow: hidden;
+      user-select: none;
+      word-break: break-all;
+      padding: 20px;
+    }
+
+    .manifesto-content {
+      position: relative;
+      max-width: 600px;
+    }
+
+    .manifesto-content p {
+      font-family: 'Courier Prime', monospace;
+      font-size: 18px;
+      line-height: 1.9;
+      color: var(--bone);
+      letter-spacing: 0.03em;
+    }
+
+    .manifesto-content p .blk {
+      background: var(--bone);
+      color: var(--bone);
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .manifesto-content p .blk:hover {
+      background: transparent;
+      color: var(--red);
+    }
+
+    .manifesto-content p .blk.revealed {
+      background: transparent;
+      color: var(--red);
+    }
+
+    /* NULL ID REGISTER */
+    .register {
+      padding: 80px 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .register-text .eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .register-text h2 {
+      font-family: 'Special Elite', cursive;
+      font-size: 36px;
+      color: var(--bone);
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+
+    .register-text p {
+      font-size: 11px;
+      color: var(--grey);
+      line-height: 1.9;
+      letter-spacing: 0.05em;
+    }
+
+    .register-form {
+      background: var(--mid);
+      border: 1px solid #222;
+      padding: 32px;
+    }
+
+    .form-row {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--grey);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-bottom: 1px solid var(--grey);
+      color: var(--bone);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+      letter-spacing: 0.1em;
+    }
+
+    .form-input:focus {
+      border-bottom-color: var(--bone);
+    }
+
+    .form-note {
+      font-size: 9px;
+      color: var(--grey);
+      letter-spacing: 0.1em;
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+
+    .form-note a {
+      color: var(--red);
+      text-decoration: none;
+    }
+
+    /* GLITCH ANIMATION */
+    @keyframes glitch {
+      0%, 90%, 100% { transform: translate(0); clip-path: none; }
+      92% { transform: translate(-3px, 1px); clip-path: inset(30% 0 40% 0); }
+      94% { transform: translate(3px, -1px); clip-path: inset(60% 0 10% 0); }
+      96% { transform: translate(-2px, 2px); clip-path: inset(10% 0 70% 0); }
+      98% { transform: translate(2px, -2px); clip-path: none; }
+    }
+
+    .glitch {
+      animation: glitch 6s infinite;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px;
+      border-top: 1px solid #1a1a1a;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .footer-logo {
+      font-family: 'Special Elite', cursive;
+      font-size: 14px;
+      letter-spacing: 0.3em;
+      color: #333;
+    }
+
+    .footer-note {
+      font-size: 9px;
+      color: #2a2a2a;
+      letter-spacing: 0.1em;
+      line-height: 2;
+      text-align: right;
+    }
+
+    .footer-note a {
+      color: #333;
+      text-decoration: none;
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 60px 20px; min-height: 80vh; }
+      .hero-dossier { display: none; }
+      .section { padding: 60px 20px; }
+      .manifesto { padding: 60px 20px; }
+      .register { grid-template-columns: 1fr; padding: 60px 20px; gap: 40px; }
+      footer { padding: 30px 20px; }
+      .footer-note { text-align: left; }
+      .status-bar { font-size: 8px; padding: 5px 12px; }
+      .ticker-inner { font-size: 9px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <span>NULLBODY SECURE CHANNEL — ENCRYPTED</span>
+    <span class="blink">● MONITORING ACTIVE</span>
+    <span id="timestamp"></span>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo glitch">NULL<span>███</span>BODY</a>
+    <ul class="nav-links">
+      <li><a href="shop.html">Catalogue</a></li>
+      <li><a href="null-id.html">NULL ID</a></li>
+      <li><a href="about.html">File #00</a></li>
+    </ul>
+    <span class="nav-id" id="nav-subject">SUBJECT: UNASSIGNED</span>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-eyebrow">▓▓▓ CLASSIFICATION: UNVERIFIED ▓▓▓</p>
+    <h1 class="hero-title glitch">
+      NULL<br><span class="redact">BODY</span>
+    </h1>
+    <p class="hero-sub">
+      Er zijn mensen wiens bestaan volledig gewist is.<br>
+      Geen records. Geen digitale voetafdruk.<br>
+      <strong>Jij bent er één van.</strong>
+    </p>
+    <div class="hero-cta">
+      <a href="shop.html" class="btn-primary">— Bekijk Catalogue</a>
+      <a href="null-id.html" class="btn-ghost">Registreer NULL ID →</a>
+    </div>
+
+    <!-- DOSSIER CARD -->
+    <div class="hero-dossier">
+      <div style="font-size:8px;letter-spacing:0.2em;color:#555;margin-bottom:12px;">INTAKE FORMULIER — [REDACTED]</div>
+      <div class="field"><span>NAAM</span><span class="val">████████</span></div>
+      <div class="field"><span>DOB</span><span class="val">██/██/████</span></div>
+      <div class="field"><span>LOCATIE</span><span class="val">████████</span></div>
+      <div class="field"><span>STATUS</span><span style="color:var(--red);font-size:9px;">UNVERIFIED</span></div>
+      <div class="field"><span>DREIGING</span><span class="val">████</span></div>
+      <div class="stamp">NULLIFIED</div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      SUBJECT #NULL-0031 REGISTERED &nbsp;<span>///</span>&nbsp; IDENTITY UNVERIFIED &nbsp;<span>///</span>&nbsp; NULLBODY DIVISION [REDACTED] &nbsp;<span>///</span>&nbsp; UV ELEMENTS ACTIVE IN ALL GARMENTS &nbsp;<span>///</span>&nbsp; CASE FILE PENDING &nbsp;<span>///</span>&nbsp; DO NOT REPRODUCE &nbsp;<span>///</span>&nbsp; SPECIMEN CATALOGUED &nbsp;<span>///</span>&nbsp; SUBJECT #NULL-0031 REGISTERED &nbsp;<span>///</span>&nbsp; IDENTITY UNVERIFIED &nbsp;<span>///</span>&nbsp; NULLBODY DIVISION [REDACTED] &nbsp;<span>///</span>&nbsp; UV ELEMENTS ACTIVE IN ALL GARMENTS &nbsp;<span>///</span>&nbsp; CASE FILE PENDING &nbsp;<span>///</span>&nbsp; DO NOT REPRODUCE &nbsp;<span>///</span>&nbsp; SPECIMEN CATALOGUED &nbsp;<span>///</span>&nbsp;
+    </div>
+  </div>
+
+  <!-- CATALOGUE PREVIEW -->
+  <section class="section">
+    <p class="section-label">▓ Catalogue — Collectie 001</p>
+    <h2 class="section-title">Gecatalogiseerde Objecten</h2>
+    <div class="products-grid">
+
+      <div class="product-card">
+        <div class="product-img">
+          <div class="product-img-inner">NULL<br>BODY</div>
+          <span class="null-id">#NULL-0012</span>
+        </div>
+        <div class="product-tag">Subject Unknown</div>
+        <p class="product-name">Hoodie — SPECIMEN</p>
+        <p class="product-sub">Oversized / Void Black<br>UV-print binnenin / Hidden ID card</p>
+        <p class="product-price">€ 84,00</p>
+        <span class="product-hidden">● UV ACTIVE</span>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">
+          <div class="product-img-inner">FILE<br>███</div>
+          <span class="null-id">#NULL-0024</span>
+        </div>
+        <div class="product-tag">Case Closed</div>
+        <p class="product-name">T-Shirt — INTAKE</p>
+        <p class="product-sub">Bone White / Washed Black<br>Medical scan print / Redacted formulier</p>
+        <p class="product-price">€ 48,00</p>
+        <span class="product-hidden">● UV ACTIVE</span>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">
+          <div class="product-img-inner">OPS<br>████</div>
+          <span class="null-id">#NULL-0007</span>
+        </div>
+        <div class="product-tag">Field Operative</div>
+        <p class="product-name">Jacket — DIVISION</p>
+        <p class="product-sub">Washed Olive / Charcoal<br>Velcro patches / QR in naad</p>
+        <p class="product-price">€ 129,00</p>
+        <span class="product-hidden">● QR + UV ACTIVE</span>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">
+          <div class="product-img-inner">█▓█<br>CLAS</div>
+          <span class="null-id">#NULL-0039</span>
+        </div>
+        <div class="product-tag">Redacted</div>
+        <p class="product-name">Broek — CARGO FILE</p>
+        <p class="product-sub">Charcoal / Washed Black<br>Gecensureerde tekststrips / Verborgen print</p>
+        <p class="product-price">€ 96,00</p>
+        <span class="product-hidden">● HIDDEN</span>
+      </div>
+
+    </div>
+    <div style="margin-top:32px;">
+      <a href="shop.html" class="btn-ghost">Bekijk volledige catalogue →</a>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section class="manifesto">
+    <div class="manifesto-bg" aria-hidden="true">
+      NULL-0000 NULL-0001 NULL-0002 IDENTITY UNVERIFIED SUBJECT UNKNOWN CASE FILE PENDING DO NOT REPRODUCE PROPERTY OF REDACTED NULLBODY DIVISION AUTHORIZED ACCESS ONLY SPECIMEN CATALOGUED DAMAGE REPORT FILED FIELD OPERATIVE CLASSIFICATION UNVERIFIED NULL-0003 NULL-0004 NULL-0005 IDENTITY UNVERIFIED SUBJECT UNKNOWN CASE FILE PENDING DO NOT REPRODUCE PROPERTY OF REDACTED NULLBODY DIVISION AUTHORIZED ACCESS ONLY SPECIMEN CATALOGUED DAMAGE REPORT FILED FIELD OPERATIVE CLASSIFICATION UNVERIFIED NULL-0006 NULL-0007 NULL-0008 IDENTITY UNVERIFIED SUBJECT UNKNOWN CASE FILE PENDING DO NOT REPRODUCE PROPERTY OF REDACTED NULLBODY DIVISION AUTHORIZED ACCESS ONLY SPECIMEN CATALOGUED DAMAGE REPORT FILED FIELD OPERATIVE CLASSIFICATION UNVERIFIED NULL-0009 NULL-0010 NULL-0011
+    </div>
+    <div class="manifesto-content">
+      <p class="section-label" style="margin-bottom:24px;">▓ Manifesto — Document #00-A</p>
+      <p>
+        Er zijn mensen wiens naam <span class="blk" onclick="this.classList.toggle('revealed')">gewist is</span> uit elk register.<br>
+        Geen paspoort. Geen adres. Geen <span class="blk" onclick="this.classList.toggle('revealed')">gezicht</span>.<br><br>
+        Ze bestaan alleen in wat ze dragen.<br>
+        De kleren zijn het enige bewijs dat ze <span class="blk" onclick="this.classList.toggle('revealed')">ooit hebben geleefd</span>.<br><br>
+        NULLBODY is niet een merk.<br>
+        Het is een <span class="blk" onclick="this.classList.toggle('revealed')">archief van de gewisten</span>.
+      </p>
+    </div>
+  </section>
+
+  <!-- NULL ID REGISTER -->
+  <section class="register">
+    <div class="register-text">
+      <p class="eyebrow">▓ NULL ID — Registratie</p>
+      <h2>Jij bestaat officieel niet.<br>Maar wij weten het.</h2>
+      <p>Elk NULLBODY kledingstuk bevat een uniek #NULL-ID. Registreer jouw ID om toegang te krijgen tot jouw persoonlijk dossier — wat er met jouw subject is gebeurd. Wie je was. Wat ze van je wisten.<br><br>Dit is geen marketing. Dit is een archief.</p>
+    </div>
+    <div class="register-form">
+      <p style="font-size:9px;letter-spacing:0.2em;color:var(--grey);margin-bottom:24px;text-transform:uppercase;">— Intake Formulier —</p>
+      <div class="form-row">
+        <label class="form-label">NULL ID (op binnenkant label)</label>
+        <input class="form-input" type="text" placeholder="NULL-XXXX" maxlength="9" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">Kledingstuk type</label>
+        <input class="form-input" type="text" placeholder="Hoodie / Jacket / etc" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">Contact (optioneel)</label>
+        <input class="form-input" type="email" placeholder="████████@████.███" />
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:8px;" onclick="handleRegister()">— Registreer Subject</button>
+      <p class="form-note">Door registratie geef je toestemming aan <a href="#">[REDACTED]</a> om jouw dossier te openen. Gegevens worden opgeslagen in een beveiligd archief. <a href="null-id.html">Meer info →</a></p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>
+      <div class="footer-logo">N U L L B O D Y</div>
+      <div style="font-size:9px;color:#222;letter-spacing:0.1em;margin-top:6px;">© [REDACTED] — ALL RIGHTS CLASSIFIED</div>
+    </div>
+    <div class="footer-note">
+      <a href="shop.html">Catalogue</a> &nbsp;/&nbsp;
+      <a href="null-id.html">NULL ID</a> &nbsp;/&nbsp;
+      <a href="about.html">File #00</a><br>
+      NULLBODY DIVISION — NL<br>
+      SUBJECT COUNT: <span id="subject-count">████</span>
+    </div>
+  </footer>
+
+  <script>
+    // Timestamp
+    function updateTimestamp() {
+      const now = new Date();
+      const ts = now.toISOString().replace('T', ' ').slice(0, 19);
+      document.getElementById('timestamp').textContent = ts + ' UTC';
+    }
+    updateTimestamp();
+    setInterval(updateTimestamp, 1000);
+
+    // Random subject number
+    const subjectNum = 'NULL-0' + String(Math.floor(Math.random() * 999)).padStart(3, '0');
+    document.getElementById('nav-subject').textContent = 'SUBJECT: ' + subjectNum;
+
+    // Fake subject count
+    document.getElementById('subject-count').textContent = Math.floor(Math.random() * 300 + 800);
+
+    // Register button
+    function handleRegister() {
+      const input = document.querySelector('.form-input').value;
+      if (input.startsWith('NULL-')) {
+        window.location.href = 'null-id.html?id=' + input;
+      } else {
+        alert('[ERROR] — ONGELDIGE NULL ID. CONTROLEER JE LABEL.');
+      }
+    }
+
+    // Konami code easter egg
+    let keys = [];
+    const konami = [38,38,40,40,37,39,37,39,66,65];
+    document.addEventListener('keydown', e => {
+      keys.push(e.keyCode);
+      keys = keys.slice(-10);
+      if (keys.join(',') === konami.join(',')) {
+        document.body.style.filter = 'hue-rotate(90deg) invert(0.1)';
+        setTimeout(() => document.body.style.filter = '', 3000);
+        alert('CLASSIFIED ACCESS GRANTED — WELCOME, OPERATIVE.');
+      }
+    });
+  </script>
+</body>
+</html>
